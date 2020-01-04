@@ -18,10 +18,11 @@
     { src: 'img/IMG_8408.jpg', msg: '背景１５'},
     { src: 'img/Mojave Day.jpg', msg: '背景１６'},
     { src: 'img/Mojave Night.jpg', msg: '背景１７'},
-    { src: 'img/Mojave.jpg', msg: '背景１８'},
+    { src: 'img/Ink Cloud.jpg', msg: '背景１８'},
     { src: 'img/Sierra 2.jpg', msg: '背景１９'},
     { src: 'img/Sierra.jpg', msg: '背景１２'},
   ];
+  let currentIndex = 0;
 
   var mainImage = document.createElement('img');
   mainImage.setAttribute('src',album[3].src);
@@ -35,18 +36,72 @@
   mainFlame.insertBefore(mainMsg, null);
 
   var thumbFlame = document.querySelector('#gallery .thumb');
-  for(let i = 0; i < album.length; i++){
+
+  album.forEach((image, index) => {
     var thumbImage = document.createElement('img');
-    thumbImage.setAttribute('src', album[i].src);
-    thumbImage.setAttribute('alt', album[i].msg);
+    thumbImage.setAttribute('src', image.src);
+    thumbImage.setAttribute('alt', image.msg);
+    
+
+    thumbImage.addEventListener('click', () => {
+      const thumb = $('.thumb img');
+      thumb[currentIndex].classList.remove('current');
+      mainImage.src = image.src;
+      mainImage.msg = image.msg;
+      currentIndex = index;
+      thumb[currentIndex].classList.add('current');
+    });
     thumbFlame.insertBefore(thumbImage, null);
 
+  });
+
+  let isPlaying = false;
+  let timeoutId;
+
+  $(function () {
+    $('#menu dt').click(function () {
+      $('#menu dd').slideToggle()
+    })
+  });
+
+  $("#next").click(function () {
+    let target = currentIndex + 1;
+    if(target === album.length){
+      target = 0;
+    }
+    document.querySelectorAll('.thumb img')[target].click();
+    mainMsg.innerText = document.querySelectorAll('.thumb img')[target].getAttribute('alt');
+  });
+  $("#prev").click(function () {
+    let target = currentIndex - 1;
+    if(target < 0){
+      target = album.length - 1;
+    }
+    document.querySelectorAll('.thumb img')[target].click();
+    mainMsg.innerText = $('.thumb img')[target].getAttribute('alt');
+  });
+
+
+  function playSlideShow() {
+    timeoutId = setTimeout(() => {
+      next.click();
+      playSlideShow();
+    }, 1000);
   }
 
-  thumbFlame.addEventListener('click', e => {
-    if (e.target.src){
-      mainImage.src = e.target.src;
-      mainMsg.innerText = e.target.alt;
+
+  $("#play").click(function () {
+    if (isPlaying === false) {
+      playSlideShow();
+      $("#play").text('Pause');
+    } else {
+      clearTimeout(timeoutId);
+      $('#play').text('Play');
     }
+    isPlaying = !isPlaying;
   });
+}
+{
+
+  
 }
